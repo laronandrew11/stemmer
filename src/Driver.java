@@ -2,55 +2,84 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class Driver {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		String filePath="";
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Enter path and filename of file to be parsed: ");
+		try {
+			filePath=br.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//TODO: for each word in the file, get the stem by calling stem() on it
+	}
+	public String stem(String input)
+	{
+		String stem=hyphenSearch(input);
+		stem=dictionarySearch(stem);
+		stem=inRemoval(stem);
+		stem=prefixRemoval(stem);
+		stem=umRemoval(stem);
+		stem=partialReduplication(stem);
+		stem=suffixRemoval(stem);
+		stem=fullReduplication(stem);
+		return stem;
+		
 	}
 	/*THE FOLLOWING FUNCTIONS ARE LISTED IN THE ORDER IN WHICH THEY ARE PERFORMED*/
-	public void hyphenSearch(String input)
+	public String hyphenSearch(String input)
 	{
 		//identify/separate the parts of a compound or duplicated word?
 		 String [] parts=input.split("-");
+		 return input;//for now; subject to change
 	}
-	public void dictionarySearch(String input)
+	public String dictionarySearch(String input)
 	{
 		//if we find a match in the dictionary, we stop?
+		return input;
 	}
-	public void inRemoval(String input){
+	public String inRemoval(String input){
 		//remove the infix -in-
-		removeInfix(input, "in");
-		
+		input=removeInfix(input, "in");
+		return input;
 	}
-	public void prefixRemoval(String input)
+	public String prefixRemoval(String input)
 	{
 		//general-purpose prefix removal based on prefix rules file
-		applyRules(input,"prefixrules.txt");
+		input=applyRules(input,"prefixrules.txt");
+		return input;
 	}
-	public void umRemoval(String input)
+	public String umRemoval(String input)
 	{
 		//remove the infix -um-
-		removeInfix(input, "um");
+		input=removeInfix(input, "um");
+		return input;
 	}
-	public void partialReduplication(String input)
+	public String partialReduplication(String input)
 	{
 		//removes partial reduplication (tatawag->tawag)
+		return input;//or return flag?
 	}
-	public void suffixRemoval(String input)
+	public String suffixRemoval(String input)
 	{
 		//general-purpose suffix removal based on prefix rules file
-		applyRules(input,"suffixrules.txt");
+		input=applyRules(input,"suffixrules.txt");
+		return input;
 	}
-	public void fullReduplication(String input)
+	public String fullReduplication(String input)
 	{
 		//identify and flag input as a fully reduplicated word (e.g. sama-sama) or compound word (e.g. lingkod-bayan)
-		
+		return input;
 	}
 	//helper functions
-	public void applyRules(String input, String filename)
+	public String applyRules(String input, String filename)
 	{
 	
 				try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
@@ -59,16 +88,17 @@ public class Driver {
 				       //apply the rule
 				    }
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
+				return input;
 	}
-	public void removeInfix(String input, String infix)
+	public String removeInfix(String input, String infix)
 	{
 		//remove the infix
-		
+		return input;
 	}
 }
