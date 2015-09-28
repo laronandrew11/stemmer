@@ -1,6 +1,9 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Driver {
 
@@ -74,7 +77,7 @@ public class Driver {
 	public String prefixRemoval(String input)
 	{
 		//general-purpose prefix removal based on prefix rules file
-		input=applyRules(input,"prefixrules.txt");
+		input=applyPrefixRules(input,"prefixrules.txt");
 		return input;
 	}
 	public String umRemoval(String input)
@@ -91,7 +94,7 @@ public class Driver {
 	public String suffixRemoval(String input)
 	{
 		//general-purpose suffix removal based on prefix rules file
-		input=applyRules(input,"suffixrules.txt");
+		input=applySuffixRules(input,"suffixrules.txt");
 		return input;
 	}
 	public String fullReduplication(String input)
@@ -100,9 +103,34 @@ public class Driver {
 		return input;
 	}
 	//helper functions
-	public String applyRules(String input, String filename)
+	public String getMatchedRegex(String input, String regex){
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(input);
+		return m.group();
+	}
+	public String applyPrefixRules(String input, String filename)
 	{
-		return input;
+		String result=input;
+		 Scanner sc=new Scanner(filename);
+		 while(sc.hasNext())
+		 {
+			 String prefix=sc.next();
+			 if(result.matches(prefix+"*"))
+				 result.replace(prefix, "");
+		 }
+		return result;
+	}
+	public String applySuffixRules(String input, String filename)
+	{
+		String result=input;
+		 Scanner sc=new Scanner(filename);
+		 while(sc.hasNext())
+		 {
+			 String suffix=sc.next();
+			 if(result.matches("*"+suffix))
+				 result.replace(suffix, "");
+		 }
+		return result;
 	}
 	public String removeInfix(String input, String infix)
 	{
