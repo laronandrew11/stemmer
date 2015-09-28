@@ -101,4 +101,31 @@ public class Driver {
 		//remove the infix
 		return input;
 	}
+	public String applyPrefixPhonemicTransformation(String input){
+		//after removing prefix
+		String newString=input;
+		if(newString.charAt(0)=='r')
+				newString.replaceFirst("r", "d");
+		return newString;
+		
+	}
+	public String applySuffixPhonemicTransformation(String input){
+		String newString=input;
+		if(newString.charAt(newString.length()-2)=='u'&&isConsonant(newString.charAt(newString.length()-1)))
+				newString=newString.substring(0,newString.length()-3)+'o'+newString.charAt(newString.length()-1);
+		return newString;
+	}
+	public boolean isConsonant(char character)
+	{
+		switch(character)
+		{
+			case 'a':
+			case 'e':
+			case 'i':
+			case 'o':
+			case 'u':
+				return false;
+		}
+		return true;
+	}
 }
