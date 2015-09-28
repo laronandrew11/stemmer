@@ -1,19 +1,22 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
+import java.util.ArrayList;
 
 public class Driver {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String filePath="";
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Enter path and filename of file to be parsed: ");
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//		System.out.println("Enter path and filename of file to be parsed: ");
+		XMLReader reader = new XMLReader();
+		ArrayList<String> dataset = new ArrayList<String>();
+		
 		try {
-			filePath=br.readLine();
+			reader.readDirectory(dataset, new File("src/March.xml"));
+			
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -22,8 +25,9 @@ public class Driver {
 	}
 	public String stem(String input)
 	{
-		String stem=hyphenSearch(input);
-		stem=dictionarySearch(stem);
+		String stem = "";
+//		String stem=hyphenSearch(input);
+//		stem=dictionarySearch(stem);
 		stem=inRemoval(stem);
 		stem=prefixRemoval(stem);
 		stem=umRemoval(stem);
@@ -48,6 +52,7 @@ public class Driver {
 	public String inRemoval(String input){
 		//remove the infix -in-
 		input=removeInfix(input, "in");
+		
 		return input;
 	}
 	public String prefixRemoval(String input)
@@ -81,24 +86,34 @@ public class Driver {
 	//helper functions
 	public String applyRules(String input, String filename)
 	{
-	
-				try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-				    String line;
-				    while ((line = br.readLine()) != null) {
-				       //apply the rule
-				    }
-				} catch (FileNotFoundException e) {
-					
-					e.printStackTrace();
-				} catch (IOException e) {
-					
-					e.printStackTrace();
-				}
-				return input;
+		return input;
 	}
 	public String removeInfix(String input, String infix)
 	{
-		//remove the infix
+		input = input.charAt(0) + input.substring(1,input.length()-1).replaceFirst(infix, "") + input.charAt(input.length());
 		return input;
+	}
+	
+	public boolean checkAcceptability(String stemmedInput) {
+		String vowels = "aeiouAEIOU";
+		
+		if (vowels.contains(stemmedInput.charAt(0)+"")) {
+			if (stemmedInput.length() < 3)
+				return false;
+			for (int i = 0; i < stemmedInput.length(); i++)
+				if (!vowels.contains(stemmedInput.charAt(i)+""))
+					return true;
+			
+			return false;
+		}
+		
+		if (stemmedInput.length() < 4)
+			return false;
+		
+		for (int i = 0; i < stemmedInput.length(); i++)
+			if (vowels.contains(stemmedInput.charAt(i)+""))
+				return true;
+
+		return false;
 	}
 }
