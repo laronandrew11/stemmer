@@ -86,6 +86,19 @@ public class Driver {
 	public String partialReduplication(String input)
 	{
 		//removes partial reduplication (tatawag->tawag)
+		String firstTwo = input.substring(0,1);
+		String firstThree = input.substring(0,2);
+		
+		if (input.length() >= 4 && !isConsonant(firstTwo.charAt(firstTwo.length()-1))) {
+			if (input.substring(2).startsWith(firstTwo))
+				return input.substring(2);
+		}
+		
+		if (input.length() >= 6 && !isConsonant(firstThree.charAt(firstThree.length()-1))) {
+			if (input.substring(3).startsWith(firstThree))
+				return input.substring(3);
+		}
+		
 		return input;//or return flag?
 	}
 	public String suffixRemoval(String input)
