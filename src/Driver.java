@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -22,18 +24,31 @@ public class Driver {
 			for (int i = 0; i < size; i++) {
 				String s = dataset.get(i);
 				
-				s = s.replaceAll("[^\\w\\s0-9-]", "");
+				s = s.replaceAll("[^\\w\\s-]", "");
 				
 				String[] list = s.split("\\s");
 				
+				System.out.println(s);
 				StringBuilder sb = new StringBuilder();
 				
 				for (String word : list) {
-					String output = stemmer.stem(word);
+					String output = stemmer.stem(word).toLowerCase();
+					//System.out.println(word + " -> " + output);
 					sb.append(" " + output);
 				}
 				
+				answerSet.add(sb.toString().trim());
+				System.out.println(sb.toString().trim());
 			}
+			
+			FileWriter fw = new FileWriter(new File("output.txt"));
+			
+			for(String s : answerSet)
+				fw.write(s + "\n");
+			
+			fw.flush();
+			fw.close();
+			
 			
 			
 		} catch (IOException e) {
@@ -44,15 +59,20 @@ public class Driver {
 	}
 	public String stem(String input)
 	{
-		String stem = "";
+		String stem = input;
 //		String stem=hyphenSearch(input);
 //		stem=dictionarySearch(stem);
+
 		stem=inRemoval(stem);
+		
 		stem=prefixRemoval(stem);
 		stem=umRemoval(stem);
 		stem=partialReduplication(stem);
 		stem=suffixRemoval(stem);
-		stem=fullReduplication(stem);
+
+		
+//		stem=fullReduplication(stem);
+//		System.out.println("AFTER FULL REDUP - " + stem);
 		return stem;
 		
 	}
@@ -80,6 +100,7 @@ public class Driver {
 		input=applyPrefixRules(input,"prefixrules.txt");
 		return input;
 	}
+
 	public String umRemoval(String input)
 	{
 		//remove the infix -um-
@@ -89,8 +110,17 @@ public class Driver {
 	public String partialReduplication(String input)
 	{
 		//removes partial reduplication (tatawag->tawag)
-		String firstTwo = input.substring(0,1);
-		String firstThree = input.substring(0,2);
+		if (input.length() < 6)
+			return input;
+		
+		String first = input.substring(0,1);
+		String firstTwo = input.substring(0,2);
+		String firstThree = input.substring(0,3);
+		
+		if (input.length() >= 2 && !isConsonant(first.charAt(0))) {
+			if (input.charAt(0) == input.charAt(1))
+				return input.substring(1);
+		}
 		
 		if (input.length() >= 4 && !isConsonant(firstTwo.charAt(firstTwo.length()-1))) {
 			if (input.substring(2).startsWith(firstTwo))
@@ -125,35 +155,78 @@ public class Driver {
 	}
 	public String applyPrefixRules(String input, String filename)
 	{
-		String result=input;
-		 Scanner sc=new Scanner(filename);
-		 while(sc.hasNext())
-		 {
-			 String prefix=sc.next();
-			 if(result.matches(prefix+"*"))
-				 result.replace(prefix, "");
-		 }
+		String result = input;
+		String oldResult = result;
+		do {
+			oldResult = result;
+			Scanner sc;
+			try {
+				sc = new Scanner(new File(filename));
+				while (sc.hasNext()) {
+					String prefix = sc.next();
+					String newResult = "";
+					if(result.startsWith(prefix))
+						 newResult = result.replaceFirst(prefix, "");
+					
+					if (checkAcceptability(newResult))
+						result = newResult;
+				}
+				
+				sc.close();
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} while(!oldResult.equals(result));
+		 
 		return result;
 	}
+
 	public String applySuffixRules(String input, String filename)
 	{
-		String result=input;
-		 Scanner sc=new Scanner(filename);
-		 while(sc.hasNext())
-		 {
-			 String suffix=sc.next();
-			 if(result.matches("*"+suffix))
-				 result.replace(suffix, "");
-		 }
+		String result = input;
+		String oldResult = result;
+		do {
+			oldResult = result;
+			try {
+				Scanner sc = new Scanner(new File(filename));
+
+				while (sc.hasNext()) {
+					String suffix = sc.next();
+					String newResult = "";
+					if(result.endsWith(suffix))
+						 newResult = result.substring(0, result.length() - suffix.length());
+					
+					if (checkAcceptability(newResult))
+						result = newResult;
+				}
+				
+				sc.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} while(!oldResult.equals(result));
+		 
 		return result;
 	}
 	public String removeInfix(String input, String infix)
 	{
-		input = input.charAt(0) + input.substring(1,input.length()-2).replaceFirst(infix, "") + input.charAt(input.length()-1);
-		return input;
+		String output = input;
+		if (input.length() > 3) {
+			output = input.charAt(0) + "";
+			output += input.substring(1, input.length()-1).replaceAll(infix, "");
+			output += input.charAt(input.length()-1);
+		}
+		return output;
 	}
 	
 	public boolean checkAcceptability(String stemmedInput) {
+		if (stemmedInput.length() == 0)
+			return false;
 		if (!isConsonant(stemmedInput.charAt(0))) {
 			if (stemmedInput.length() < 3)
 				return false;
